@@ -1,5 +1,5 @@
 FROM gitpod/workspace-postgres
-                    
+
 USER gitpod
 
 # Install custom tools, runtime, etc. using apt-get
