@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -17,5 +16,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 12.x
-    - run: npm ci
-    - run: npm test
+    - name: Run npm ci
+      working-directory: frontend
+      run: npm ci
+
+    - name: Run npm test
+      working-directory: frontend
+      run: npm test
