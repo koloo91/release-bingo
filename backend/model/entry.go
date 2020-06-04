@@ -23,7 +23,7 @@ type Entry struct {
 
 type EntryVo struct {
 	Id      string    `json:"id"`
-	Text    string    `json:"text"`
+	Text    string    `json:"text" binding:"required"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
 }
@@ -39,4 +39,14 @@ func EntryEntityToVo(entity *Entry) *EntryVo {
 		Created: entity.Created,
 		Updated: entity.Updated,
 	}
+}
+
+func EntryEntitiesToVos(entries []*Entry) []*EntryVo {
+	result := make([]*EntryVo, 0, len(entries))
+
+	for _, entry := range entries {
+		result = append(result, EntryEntityToVo(entry))
+	}
+
+	return result
 }

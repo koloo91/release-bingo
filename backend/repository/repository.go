@@ -3,38 +3,51 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"github.com/koloo91/release-bingo/model"
+	"github.com/lib/pq"
 	"time"
 )
 
 var (
 	database *sql.DB
 
-	insertStatement     *sql.Stmt
-	getAllStatement     *sql.Stmt
-	updateStatement     *sql.Stmt
-	deleteByIdStatement *sql.Stmt
-	deleteAllStatement  *sql.Stmt
+	insertEntryStatement      *sql.Stmt
+	getAllEntriesStatement    *sql.Stmt
+	getEntryStatement         *sql.Stmt
+	updateEntryStatement      *sql.Stmt
+	deleteEntryStatement      *sql.Stmt
+	deleteAllEntriesStatement *sql.Stmt
+
+	ErrEntryNotFound = fmt.Errorf("entry not found")
 )
 
 func SetDatabase(db *sql.DB) {
 	database = db
 
-	insertStatement, _ = database.Prepare("INSERT INTO entries(id, text, created, updated) VALUES ($1, $2, $3, $4);")
-	getAllStatement, _ = database.Prepare("SELECT id, text, created, updated FROM entries;")
-	updateStatement, _ = database.Prepare("UPDATE entries SET text=$2, updated=$3 WHERE id = $1;")
-	deleteByIdStatement, _ = database.Prepare("DELETE FROM entries WHERE id = $1;")
-	deleteAllStatement, _ = database.Prepare("DELETE FROM entries;")
+	insertEntryStatement, _ = database.Prepare("INSERT INTO entries(id, text, created, updated) VALUES ($1, $2, $3, $4);")
+	getAllEntriesStatement, _ = database.Prepare("SELECT id, text, created, updated FROM entries;")
+	getEntryStatement, _ = database.Prepare("SELECT id, text, created, updated FROM entries WHERE id = $1;")
+	updateEntryStatement, _ = database.Prepare("UPDATE entries SET text=$2, updated=$3 WHERE id = $1;")
+	deleteEntryStatement, _ = database.Prepare("DELETE FROM entries WHERE id = $1;")
+	deleteAllEntriesStatement, _ = database.Prepare("DELETE FROM entries;")
 }
 
 func SaveEntry(ctx context.Context, entry *model.Entry) error {
-	_, err := insertStatement.ExecContext(ctx, entry.Id, entry.Text, entry.Created, entry.Updated)
+	_, err := insertEntryStatement.ExecContext(ctx, entry.Id, entry.Text, entry.Created, entry.Updated)
+	if err, ok := err.(*pq.Error); ok {
+		return errors.New(err.Message)
+	}
 	return err
 }
 
-func GetAll(ctx context.Context) ([]*model.Entry, error) {
-	rows, err := getAllStatement.QueryContext(ctx)
+func GetAllEntries(ctx context.Context) ([]*model.Entry, error) {
+	rows, err := getAllEntriesStatement.QueryContext(ctx)
 	if err != nil {
+		if err, ok := err.(*pq.Error); ok {
+			return nil, errors.New(err.Message)
+		}
 		return nil, err
 	}
 
@@ -44,6 +57,9 @@ func GetAll(ctx context.Context) ([]*model.Entry, error) {
 
 	for rows.Next() {
 		if err := rows.Scan(&id, &text, &created, &updated); err != nil {
+			if err, ok := err.(*pq.Error); ok {
+				return nil, errors.New(err.Message)
+			}
 			return nil, err
 		}
 
@@ -58,22 +74,55 @@ func GetAll(ctx context.Context) ([]*model.Entry, error) {
 	return result, nil
 }
 
-func UpdateEntry(ctx context.Context, id string, entry *model.Entry) error {
-	if _, err := updateStatement.ExecContext(ctx, id, entry.Text, entry.Updated); err != nil {
+func GetEntry(ctx context.Context, entryId string) (*model.Entry, error) {
+	row := getEntryStatement.QueryRowContext(ctx, entryId)
+
+	var id, text string
+	var created, updated time.Time
+
+	if err := row.Scan(&id, &text, &created, &updated); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, ErrEntryNotFound
+		}
+		if err, ok := err.(*pq.Error); ok {
+			return nil, errors.New(err.Message)
+		}
+		return nil, err
+	}
+
+	return &model.Entry{
+		Id:      id,
+		Text:    text,
+		Created: created,
+		Updated: updated,
+	}, nil
+}
+
+func UpdateEntry(ctx context.Context, id, text string) error {
+	if _, err := updateEntryStatement.ExecContext(ctx, id, text, time.Now()); err != nil {
+		if err, ok := err.(*pq.Error); ok {
+			return errors.New(err.Message)
+		}
 		return err
 	}
 	return nil
 }
 
-func DeleteById(ctx context.Context, id string) error {
-	if _, err := deleteByIdStatement.ExecContext(ctx, id); err != nil {
+func DeleteEntry(ctx context.Context, id string) error {
+	if _, err := deleteEntryStatement.ExecContext(ctx, id); err != nil {
+		if err, ok := err.(*pq.Error); ok {
+			return errors.New(err.Message)
+		}
 		return err
 	}
 	return nil
 }
 
-func DeleteAll(ctx context.Context) error {
-	if _, err := deleteAllStatement.ExecContext(ctx); err != nil {
+func DeleteAllEntries(ctx context.Context) error {
+	if _, err := deleteAllEntriesStatement.ExecContext(ctx); err != nil {
+		if err, ok := err.(*pq.Error); ok {
+			return errors.New(err.Message)
+		}
 		return err
 	}
 	return nil
