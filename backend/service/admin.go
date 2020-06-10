@@ -18,8 +18,8 @@ func GetEntryById(ctx context.Context, id string) (*model.Entry, error) {
 	return repository.GetEntry(ctx, id)
 }
 
-func UpdateEntry(ctx context.Context, id, text string) (*model.Entry, error) {
-	if err := repository.UpdateEntry(ctx, id, text); err != nil {
+func UpdateEntry(ctx context.Context, id, text string, checked bool) (*model.Entry, error) {
+	if err := repository.UpdateEntry(ctx, id, text, checked); err != nil {
 		return nil, err
 	}
 

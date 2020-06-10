@@ -55,7 +55,7 @@ func (suite *BaseTestSuite) TestUpdateEntry() {
 	entry := model.NewEntry("Hello")
 	suite.Nil(repository.SaveEntry(context.Background(), entry))
 
-	suite.Nil(repository.UpdateEntry(context.Background(), entry.Id, "Hello world"))
+	suite.Nil(repository.UpdateEntry(context.Background(), entry.Id, "Hello world", true))
 
 	entryFromDb, err := repository.GetEntry(context.Background(), entry.Id)
 	suite.Nil(err)
@@ -63,7 +63,7 @@ func (suite *BaseTestSuite) TestUpdateEntry() {
 	suite.Equal(entry.Id, entryFromDb.Id)
 	suite.Equal("Hello world", entryFromDb.Text)
 
-	err = repository.UpdateEntry(context.Background(), uuid.New().String(), "Hello world")
+	err = repository.UpdateEntry(context.Background(), uuid.New().String(), "Hello world", false)
 	suite.Nil(err)
 }
 

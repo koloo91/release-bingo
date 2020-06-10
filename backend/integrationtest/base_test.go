@@ -45,7 +45,7 @@ func (suite *BaseTestSuite) SetupSuite() {
 		log.Fatalf("Error getting mapped port: %v", err)
 	}
 
-	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port.Port(), user, password, dbname)
+	connectionString := fmt.Sprintf("wsHost=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port.Port(), user, password, dbname)
 	db, _ := sql.Open("postgres", connectionString)
 
 	driver, _ := postgres.WithInstance(db, &postgres.Config{})
@@ -76,7 +76,7 @@ func setupPostgresTestContainer() (testcontainers.Container, error) {
 		ExposedPorts: []string{"5432/tcp"},
 		Env:          map[string]string{"POSTGRES_PASSWORD": "Pass00"},
 		WaitingFor: wait.ForSQL("5432/tcp", "postgres", func(port nat.Port) string {
-			return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port.Port(), user, password, dbname)
+			return fmt.Sprintf("wsHost=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port.Port(), user, password, dbname)
 		}),
 	}
 

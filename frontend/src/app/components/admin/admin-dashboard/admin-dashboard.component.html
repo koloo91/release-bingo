@@ -1,0 +1,19 @@
+<div id="admin-dashboard-component" fxLayout="column" fxLayoutAlign="start center">
+  <h1 class="mat-display-2">Admin Dashboard</h1>
+  <mat-progress-bar *ngIf="isLoadingEntries$ | async"></mat-progress-bar>
+  <div class="list-container">
+    <mat-list *ngIf="!(isLoadingEntries$ | async)">
+      <mat-list-item *ngFor="let entry of (entries$ | async); id as key">
+        <mat-checkbox (change)="onCheckBoxChanged($event, entry)" mat-line >{{entry.text}}</mat-checkbox>
+        <small  mat-line>{{entry.created | date: 'dd.MM.yyyy HH:mm:ss'}}</small>
+        <button mat-icon-button (click)="deleteEntry(entry.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-list-item>
+    </mat-list>
+  </div>
+
+  <button mat-fab color="primary" aria-label="Example icon button with a delete icon" (click)="openAddEntryDialog()">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

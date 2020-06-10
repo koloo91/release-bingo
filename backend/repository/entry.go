@@ -26,16 +26,16 @@ var (
 func SetDatabase(db *sql.DB) {
 	database = db
 
-	insertEntryStatement, _ = database.Prepare("INSERT INTO entries(id, text, created, updated) VALUES ($1, $2, $3, $4);")
-	getAllEntriesStatement, _ = database.Prepare("SELECT id, text, created, updated FROM entries;")
-	getEntryStatement, _ = database.Prepare("SELECT id, text, created, updated FROM entries WHERE id = $1;")
-	updateEntryStatement, _ = database.Prepare("UPDATE entries SET text=$2, updated=$3 WHERE id = $1;")
+	insertEntryStatement, _ = database.Prepare("INSERT INTO entries(id, text, checked, created, updated) VALUES ($1, $2, $3, $4, $5);")
+	getAllEntriesStatement, _ = database.Prepare("SELECT id, text, checked, created, updated FROM entries;")
+	getEntryStatement, _ = database.Prepare("SELECT id, text, checked, created, updated FROM entries WHERE id = $1;")
+	updateEntryStatement, _ = database.Prepare("UPDATE entries SET text=$2, checked=$3, updated=$4 WHERE id = $1;")
 	deleteEntryStatement, _ = database.Prepare("DELETE FROM entries WHERE id = $1;")
 	deleteAllEntriesStatement, _ = database.Prepare("DELETE FROM entries;")
 }
 
 func SaveEntry(ctx context.Context, entry *model.Entry) error {
-	_, err := insertEntryStatement.ExecContext(ctx, entry.Id, entry.Text, entry.Created, entry.Updated)
+	_, err := insertEntryStatement.ExecContext(ctx, entry.Id, entry.Text, entry.Checked, entry.Created, entry.Updated)
 	if err, ok := err.(*pq.Error); ok {
 		return errors.New(err.Message)
 	}
@@ -53,10 +53,11 @@ func GetAllEntries(ctx context.Context) ([]*model.Entry, error) {
 
 	result := make([]*model.Entry, 0)
 	var id, text string
+	var checked bool
 	var created, updated time.Time
 
 	for rows.Next() {
-		if err := rows.Scan(&id, &text, &created, &updated); err != nil {
+		if err := rows.Scan(&id, &text, &checked, &created, &updated); err != nil {
 			if err, ok := err.(*pq.Error); ok {
 				return nil, errors.New(err.Message)
 			}
@@ -66,6 +67,7 @@ func GetAllEntries(ctx context.Context) ([]*model.Entry, error) {
 		result = append(result, &model.Entry{
 			Id:      id,
 			Text:    text,
+			Checked: checked,
 			Created: created,
 			Updated: updated,
 		})
@@ -78,9 +80,10 @@ func GetEntry(ctx context.Context, entryId string) (*model.Entry, error) {
 	row := getEntryStatement.QueryRowContext(ctx, entryId)
 
 	var id, text string
+	var checked bool
 	var created, updated time.Time
 
-	if err := row.Scan(&id, &text, &created, &updated); err != nil {
+	if err := row.Scan(&id, &text, &checked, &created, &updated); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, ErrEntryNotFound
 		}
@@ -93,13 +96,14 @@ func GetEntry(ctx context.Context, entryId string) (*model.Entry, error) {
 	return &model.Entry{
 		Id:      id,
 		Text:    text,
+		Checked: checked,
 		Created: created,
 		Updated: updated,
 	}, nil
 }
 
-func UpdateEntry(ctx context.Context, id, text string) error {
-	if _, err := updateEntryStatement.ExecContext(ctx, id, text, time.Now()); err != nil {
+func UpdateEntry(ctx context.Context, id, text string, checked bool) error {
+	if _, err := updateEntryStatement.ExecContext(ctx, id, text, checked, time.Now()); err != nil {
 		if err, ok := err.(*pq.Error); ok {
 			return errors.New(err.Message)
 		}

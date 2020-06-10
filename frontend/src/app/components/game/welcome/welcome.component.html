@@ -1,0 +1,15 @@
+<div id="welcome-component" fxLayout="column" fxLayoutAlign="center center">
+  <mat-progress-bar *ngIf="isConnectingToGame$ | async" mode="indeterminate"></mat-progress-bar>
+  <h1 class="mat-display-3">Release-Bingo</h1>
+
+  <div>
+    <span class="mat-title">Bitte gib deinen Namen ein:</span>
+
+    <form [formGroup]="nameFormGroup" (ngSubmit)="onSubmit()">
+      <mat-form-field class="example-full-width">
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="Name" value="" formControlName="name">
+      </mat-form-field>
+    </form>
+  </div>
+</div>

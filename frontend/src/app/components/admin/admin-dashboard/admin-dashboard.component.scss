@@ -1,0 +1,31 @@
+#admin-dashboard-component {
+  height: 100%;
+
+  @media only screen and (min-width: 768px) {
+    width: 50%;
+    margin: auto;
+  }
+
+  mat-spinner {
+    position: relative;
+    top: 44%;
+    bottom: 50%;
+  }
+
+  .list-container {
+    width: 100%;
+    margin-left: 8px;
+    margin-right: 8px;
+    overflow: scroll;
+
+    mat-list {
+      width: 100%;
+    }
+  }
+
+  button {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+  }
+}

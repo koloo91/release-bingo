@@ -9,6 +9,7 @@ func NewEntry(text string) *Entry {
 	return &Entry{
 		Id:      uuid.New().String(),
 		Text:    text,
+		Checked: false,
 		Created: time.Now(),
 		Updated: time.Now(),
 	}
@@ -17,6 +18,7 @@ func NewEntry(text string) *Entry {
 type Entry struct {
 	Id      string
 	Text    string
+	Checked bool
 	Created time.Time
 	Updated time.Time
 }
@@ -24,6 +26,7 @@ type Entry struct {
 type EntryVo struct {
 	Id      string    `json:"id"`
 	Text    string    `json:"text" binding:"required"`
+	Checked bool      `json:"checked"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
 }
@@ -36,6 +39,7 @@ func EntryEntityToVo(entity *Entry) *EntryVo {
 	return &EntryVo{
 		Id:      entity.Id,
 		Text:    entity.Text,
+		Checked: entity.Checked,
 		Created: entity.Created,
 		Updated: entity.Updated,
 	}

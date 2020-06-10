@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+.idea
+.github
+.git
+Dockerfile
+.DS_Store
+.gitignore
+README.md

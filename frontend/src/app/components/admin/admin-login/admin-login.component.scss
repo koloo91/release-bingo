@@ -1,0 +1,18 @@
+#admin-login-component {
+  height: 100%;
+
+  @media only screen and (min-width: 768px) {
+    width: 50%;
+    margin: auto;
+  }
+
+  .login-form {
+    width: 80%;
+  }
+
+  form {
+    mat-form-field {
+      width: 100%;
+    }
+  }
+}

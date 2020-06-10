@@ -1,0 +1,37 @@
+#current-game-component {
+  height: 100%;
+
+  @media only screen and (min-width: 768px) {
+    width: 50%;
+    margin: auto;
+  }
+
+  h1 {
+    margin-top: 8px;
+  }
+
+  table, th, td {
+    table-layout: fixed;
+    border: 1px solid black;
+    border-collapse: collapse;
+
+    td {
+      width: 25%;
+      min-height: 60px;
+      height: 60px;
+      padding: 10px;
+      text-align: center;
+    }
+  }
+
+  .card-table {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .cross-image {
+    background-image: url("src/assets/cross.svg");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+}

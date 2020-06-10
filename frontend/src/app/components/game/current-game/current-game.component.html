@@ -1,0 +1,30 @@
+<div id="current-game-component" fxLayout="column" fxLayoutAlign="start center">
+  <h1 class="mat-display-2" *ngIf="userName$ | async as userName">{{userName}}</h1>
+  <div *ngIf="(users$ | async) as users">
+    <p [matTooltip]="users.join(', ')">Es sind {{users.length - 1}} andere Spieler dabei.</p>
+  </div>
+  <div class="card-table">
+    <table *ngIf="(card$ | async) as card">
+      <tr>
+        <td *ngFor="let field of card.rowOne" [class.cross-image]="field.checked">
+          {{field.text}}
+        </td>
+      </tr>
+      <tr>
+        <td *ngFor="let field of card.rowTwo" [class.cross-image]="field.checked">
+          {{field.text}}
+        </td>
+      </tr>
+      <tr>
+        <td *ngFor="let field of card.rowThree" [class.cross-image]="field.checked">
+          {{field.text}}
+        </td>
+      </tr>
+      <tr>
+        <td *ngFor="let field of card.rowFour" [class.cross-image]="field.checked">
+          {{field.text}}
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
